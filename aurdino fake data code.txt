@@ -1,0 +1,45 @@
+/*
+  Fake Air Quality Sensor Data Generator for Arduino Nano
+  Outputs formatted JSON data over Serial at 9600 baud.
+*/
+//run in new port and com 8 
+
+unsigned long lastSendTime = 0;
+const long interval = 2000; // Send data every 2 seconds
+
+void setup() {
+  Serial.begin(9600); // Set baud rate matching Python script (e.g. COM8 at 9600)
+  randomSeed(analogRead(0)); // Seed random generator using un-connected analog pin
+}
+
+void loop() {
+  unsigned long currentMillis = millis();
+
+  // Non-blocking timer
+  if (currentMillis - lastSendTime >= interval) {
+    lastSendTime = currentMillis;
+
+    // Generate realistic fluctuating simulated data
+    int aqi = random(40, 160);              // AQI value
+    float pm25 = random(120, 350) / 10.0;    // PM2.5 in ug/m3
+    float pm10 = random(250, 600) / 10.0;    // PM10 in ug/m3
+    int co2 = random(400, 1100);             // CO2 in ppm
+    float temp = random(220, 320) / 10.0;    // Temp in °C
+    float humidity = random(400, 700) / 10.0;// Humidity in %
+
+    // Format and print as a single JSON line
+    Serial.print("{\"aqi\":");
+    Serial.print(aqi);
+    Serial.print(",\"pm25\":");
+    Serial.print(pm25, 1);
+    Serial.print(",\"pm10\":");
+    Serial.print(pm10, 1);
+    Serial.print(",\"co2\":");
+    Serial.print(co2);
+    Serial.print(",\"temperature\":");
+    Serial.print(temp, 1);
+    Serial.print(",\"humidity\":");
+    Serial.print(humidity, 1);
+    Serial.println("}");
+  }
+}
